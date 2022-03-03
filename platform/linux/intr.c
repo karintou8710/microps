@@ -76,21 +76,21 @@ intr_thread(void *arg)
             break;
         }
         switch (sig) {
-            case SIGHUP:
-                terminate = 1;
-                break;
-            default:
-                for (entry = irqs; entry; entry = entry->next) {
-                    if (entry->irq == (unsigned int)sig) {
-                        debugf("irq=%d, name=%s", entry->irq, entry->name);
-                        entry->handler(entry->irq, entry->dev);
-                    }
+        case SIGHUP:
+            terminate = 1;
+            break;
+        default:
+            for (entry = irqs; entry; entry = entry->next) {
+                if (entry->irq == (unsigned int)sig) {
+                    debugf("irq=%d, name=%s", entry->irq, entry->name);
+                    entry->handler(entry->irq, entry->dev);
                 }
-                break;
+            }
+            break;
         }
-        debugf("terminated");
-        return NULL;
     }
+    debugf("terminated");
+    return NULL;
 }
 
 int
