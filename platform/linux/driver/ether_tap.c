@@ -169,6 +169,7 @@ static struct net_device_ops ether_tap_ops = {
     .transmit = ether_tap_transmit,
 };
 
+// イーサネットデバイスを初期化, 登録する
 struct net_device *
 ether_tap_init(const char *name, const char *addr)
 {
