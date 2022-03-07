@@ -248,6 +248,7 @@ net_shutdown(void)
     debugf("shutting down");
 }
 
+#include "arp.h"
 #include "ip.h"
 #include "icmp.h"
 
@@ -264,6 +265,10 @@ net_init(void)
     }
     if (icmp_init() == -1) {
         errorf("icmp_init() failure");
+        return -1;
+    }
+    if (arp_init() == -1) {
+        errorf("arp_init() failure");
         return -1;
     }
     infof("initialized");
