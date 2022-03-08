@@ -135,6 +135,7 @@ ether_tap_read(struct net_device *dev, uint8_t *buf, size_t size)
     return len;
 }
 
+// 割込みハンドラー
 static int
 ether_tap_isr(unsigned int irq, void *id)
 {

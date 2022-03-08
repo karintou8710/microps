@@ -227,6 +227,8 @@ ip_iface_register(struct net_device *dev, struct ip_iface *iface)
         errorf("net_device_add_iface() failure");
         return -1;
     }
+    // ifacesは全てのip_ifaceを管理しているのでルーティングテーブルを作れる
+    // ip_iface->nextとnet_iface->nextは異なる
     if (!ip_route_add(iface->unicast & iface->netmask, iface->netmask, IP_ADDR_ANY, iface)) {
         errorf("ip_route_add() failure");
         return -1;

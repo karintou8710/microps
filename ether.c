@@ -110,6 +110,7 @@ ether_input_helper(struct net_device *dev, ether_input_func_t callback)
             return -1;
         }
     }
+    // エンディアンの変換は2byte以上の変数に対してする
     type = ntoh16(hdr->type); // ARP, IPV4 etc...
     debugf("dev=%s, type=0x%04x, len=%zd", dev->name, type, flen);
     ether_dump(frame, flen);

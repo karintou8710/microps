@@ -29,10 +29,14 @@ setup(void)
     struct ip_iface *iface;
 
     signal(SIGINT, on_signal);
+    // プロトコルの登録
+    // net, ipの2種類ある
     if (net_init() == -1) {
         errorf("net_init() failure");
         return -1;
     }
+    // ループバックデバイスの初期化と登録
+    // devはifaceをメンバーに持つ。ifaceは対応するIPアドレスやネットマスクを持つ
     dev = loopback_init();
     if (!dev) {
         errorf("loopback_init() failure");
@@ -48,6 +52,8 @@ setup(void)
         return -1;
     }
 
+    // イーサネットデバイスの初期化と登録
+    // IRQの設定もする
     dev = ether_tap_init(ETHER_TAP_NAME, ETHER_TAP_HW_ADDR);
     if (!dev) {
         errorf("ether_tap_init() failure");
@@ -62,11 +68,12 @@ setup(void)
         errorf("ip_iface_register() failure");
         return -1;
     }
+    // デフォルトゲートウェイの設定
     if (ip_route_set_default_gateway(iface, DEFAULT_GATEWAY) == -1) {
         errorf("ip_route_set_default_gateway() failure");
         return -1;
     }
-
+    // 割込みスレッドの生成とデバイスのオープン
     if (net_run() == -1) {
         errorf("net_run() failure");
         return -1;
@@ -87,7 +94,6 @@ main(int argc, char *argv[])
         errorf("invalid args number");
         return -1;
     }
-    // 引数のバリデーションはしない。ユーザー側が正しいものを入力する。
     ip_addr_t src, dst;
     uint16_t id, seq = 0;
     size_t offset = IP_HDR_SIZE_MIN + ICMP_HDR_SIZE;
@@ -97,7 +103,10 @@ main(int argc, char *argv[])
         return -1;
     }
     src = IP_ADDR_ANY;
-    ip_addr_pton(argv[1], &dst);
+    if (ip_addr_pton(argv[1], &dst) == -1) {
+        errorf("ip_addr_pton() failure");
+        return -1;
+    }
     id = getpid() % UINT16_MAX;
     while (!terminate) {
         if (icmp_output(ICMP_TYPE_ECHO, 0, hton32(id << 16 || ++seq), test_data + offset, sizeof(test_data) - offset, src, dst) == -1) {
